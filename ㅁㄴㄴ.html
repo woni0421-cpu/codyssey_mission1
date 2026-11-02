@@ -1,0 +1,381 @@
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건물 주민 커뮤니티 앱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            min-height: 100vh;
+        }
+        .screen {
+            display: none;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .screen.active {
+            display: block;
+        }
+        button, input[type="button"], input[type="submit"] {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-buttons button {
+            flex: 1;
+            min-width: 100px;
+        }
+        .post-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .post-item:hover {
+            background-color: #f0f0f0;
+        }
+        .post-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .post-preview {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .post-meta {
+            font-size: 12px;
+            color: #999;
+        }
+        .category-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .category-buttons button {
+            padding: 15px;
+            font-size: 14px;
+        }
+        .comment-item {
+            border-left: 3px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #fafafa;
+            margin-left: 10px;
+        }
+        .reply-item {
+            border-left: 3px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f5f5f5;
+            margin-left: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .chat-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .chat-item:hover {
+            background-color: #f0f0f0;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #e3f2fd;
+        }
+        .message.sent {
+            background-color: #c8e6c9;
+            text-align: right;
+        }
+        .back-button {
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-group button {
+            flex: 1;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 1. 위치 인증 화면 -->
+        <div id="authScreen" class="screen active">
+            <div class="header">건물 위치 인증</div>
+            <div class="info-box">
+                <p>건물 위치 인증을 통해 같은 건물 입주민임을 확인합니다.</p>
+            </div>
+            <button onclick="authenticateLocation()" style="width: 100%; padding: 15px; font-size: 16px;">
+                현재 위치로 인증하기
+            </button>
+            <div id="authMessage" style="margin-top: 20px; padding: 10px; text-align: center;"></div>
+        </div>
+
+        <!-- 2. 홈 화면 -->
+        <div id="homeScreen" class="screen">
+            <div class="header">홈</div>
+            <div class="nav-buttons">
+                <button onclick="goToWritePost()">글쓰기</button>
+                <button onclick="goToCategories()">카테고리</button>
+                <button onclick="goToMyPage()">마이페이지</button>
+                <button onclick="goToChatList()">채팅</button>
+            </div>
+            <h3>최신 글 목록</h3>
+            <div id="postListHome"></div>
+        </div>
+
+        <!-- 3. 카테고리 선택 화면 -->
+        <div id="categoryScreen" class="screen">
+            <div class="header">카테고리 선택</div>
+            <button class="back-button" onclick="goToHome()">← 돌아가기</button>
+            <div class="category-buttons">
+                <button onclick="goToCategory('자유게시판')">자유게시판</button>
+                <button onclick="goToCategory('분실물')">분실물</button>
+                <button onclick="goToCategory('장터/나눔')">장터/나눔</button>
+                <button onclick="goToCategory('빌려주세요')">빌려주세요</button>
+                <button onclick="goToCategory('공동구매')">공동구매</button>
+                <button onclick="goToCategory('배달 같이하기')">배달 같이하기</button>
+                <button onclick="goToCategory('층간소음')">층간소음</button>
+            </div>
+        </div>
+
+        <!-- 4. 카테고리별 글 목록 화면 -->
+        <div id="categoryPostScreen" class="screen">
+            <div class="header" id="categoryTitle"></div>
+            <button class="back-button" onclick="goToCategories()">← 돌아가기</button>
+            <button onclick="goToWritePost()" style="width: 100%; margin-bottom: 15px;">글쓰기</button>
+            <div id="categoryPostList"></div>
+        </div>
+
+        <!-- 5. 글쓰기 화면 -->
+        <div id="writePostScreen" class="screen">
+            <div class="header">글쓰기</div>
+            <button class="back-button" onclick="goToHome()">← 돌아가기</button>
+            
+            <div class="form-group">
+                <label>카테고리 선택</label>
+                <select id="postCategory" onchange="updateAnonymousOption()">
+                    <option value="">선택하세요</option>
+                    <option value="자유게시판">자유게시판</option>
+                    <option value="분실물">분실물</option>
+                    <option value="장터/나눔">장터/나눔</option>
+                    <option value="빌려주세요">빌려주세요</option>
+                    <option value="공동구매">공동구매</option>
+                    <option value="배달 같이하기">배달 같이하기</option>
+                    <option value="층간소음">층간소음</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" id="postTitle" placeholder="제목을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label>본문</label>
+                <textarea id="postContent" placeholder="본문을 입력하세요"></textarea>
+            </div>
+
+            <div class="form-group" id="anonymousGroup">
+                <label>작성자 표시</label>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="radio" name="postAnonymous" value="false" checked> 닉네임
+                    </label>
+                    <label>
+                        <input type="radio" name="postAnonymous" value="true"> 익명
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="submitPost()" style="width: 100%; padding: 15px; font-size: 16px;">
+                게시하기
+            </button>
+        </div>
+
+        <!-- 6. 게시글 상세 화면 -->
+        <div id="postDetailScreen" class="screen">
+            <button class="back-button" onclick="goBack()">← 돌아가기</button>
+            <div class="info-box">
+                <div class="post-title" id="detailTitle"></div>
+                <div class="post-meta" id="detailMeta"></div>
+            </div>
+            <div class="info-box">
+                <div id="detailContent"></div>
+            </div>
+
+            <div id="postActionButtons" class="button-group"></div>
+
+            <h4 style="margin-top: 20px;">댓글</h4>
+            <div id="commentList"></div>
+
+            <div class="form-group" style="margin-top: 20px;">
+                <label>댓글 작성</label>
+                <textarea id="commentContent" placeholder="댓글을 입력하세요"></textarea>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="radio" name="commentAnonymous" value="false" checked> 닉네임
+                    </label>
+                    <label>
+                        <input type="radio" name="commentAnonymous" value="true"> 익명
+                    </label>
+                </div>
+                <button onclick="submitComment()" style="width: 100%;">댓글 등록</button>
+            </div>
+        </div>
+
+        <!-- 7. 채팅 목록 화면 -->
+        <div id="chatListScreen" class="screen">
+            <div class="header">채팅 목록</div>
+            <button class="back-button" onclick="goToHome()">← 돌아가기</button>
+            <div id="chatList"></div>
+        </div>
+
+        <!-- 8. 1:1 채팅 화면 -->
+        <div id="chatScreen" class="screen">
+            <div class="header" id="chatHeader"></div>
+            <button class="back-button" onclick="goToChatList()">← 돌아가기</button>
+            
+            <div class="info-box">
+                <strong>연결된 게시글:</strong>
+                <div id="linkedPost"></div>
+            </div>
+
+            <div id="messageList" style="border: 1px solid #ddd; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 15px; border-radius: 4px;"></div>
+
+            <div class="form-group">
+                <textarea id="messageContent" placeholder="메시지를 입력하세요" style="min-height: 60px;"></textarea>
+                <button onclick="sendMessage()" style="width: 100%;">전송</button>
+            </div>
+
+            <button onclick="reportChat()" style="width: 100%; background-color: #ffcccc;">채팅 신고</button>
+        </div>
+
+        <!-- 9. 신고 화면 -->
+        <div id="reportScreen" class="screen">
+            <div class="header">신고하기</div>
+            <button class="back-button" onclick="goBack()">← 돌아가기</button>
+
+            <div class="form-group">
+                <label>신고 사유</label>
+                <select id="reportReason">
+                    <option value="">선택하세요</option>
+                    <option value="욕설/비방">욕설/비방</option>
+                    <option value="도배">도배</option>
+                    <option value="사기 의심">사기 의심</option>
+                    <option value="개인정보 노출">개인정보 노출</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>신고 내용</label>
+                <textarea id="reportContent" placeholder="신고 내용을 입력하세요"></textarea>
+            </div>
+
+            <button onclick="submitReport()" style="width: 100%; padding: 15px; font-size: 16px;">
+                신고 제출
+            </button>
+        </div>
+
+        <!-- 10. 마이페이지 화면 -->
+        <div id="myPageScreen" class="screen">
+            <div class="header">마이페이지</div>
+            <button class="back-button" onclick="goToHome()">← 돌아가기</button>
+
+            <div class="info-box">
+                <h4>내 정보</h4>
+                <p><strong>닉네임:</strong> <span id="myNickname"></span></p>
+                <input type="text" id="newNickname" placeholder="새 닉네임">
+                <button onclick="updateNickname()" style="width: 100%;">닉네임 변경</button>
+            </div>
+
+            <div class="info-box">
+                <h4>위치 인증 상태</h4>
+                
