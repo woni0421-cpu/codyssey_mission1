@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Tier List</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel2: #1f2937;
+      --card: #020617;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --line: rgba(255, 255, 255, 0.12);
+      --accent: #6366f1;
+      --accent2: #a855f7;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --warning: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.2), transparent 32%),
+        radial-gradient(circle at top right, rgba(168, 85, 247, 0.18), transparent 34%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.86);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .logo strong {
+      font-size: 22px;
+      letter-spacing: -0.03em;
+    }
+
+    .logo span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .login-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 10px 13px;
+      background: var(--panel2);
+      transition: 0.18s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: #374151;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #9333ea);
+    }
+
+    .danger {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fecaca;
+    }
+
+    .danger:hover {
+      background: rgba(239, 68, 68, 0.28);
+    }
+
+    .small-btn {
+      padding: 7px 9px;
+      font-size: 13px;
+      border-radius: 8px;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px 20px 60px;
+    }
+
+    .notice {
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      background: rgba(99, 102, 241, 0.13);
+      border-radius: 16px;
+      padding: 14px 16px;
+      color: #e0e7ff;
+      line-height: 1.55;
+      margin-bottom: 18px;
+    }
+
+    .notice b {
+      color: #ffffff;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      background: rgba(31, 41, 55, 0.85);
+      border: 1px solid var(--line);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.95), rgba(168, 85, 247, 0.95));
+      border-color: transparent;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(17, 24, 39, 0.88);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel h2,
+    .panel h3 {
+      margin: 0 0 12px;
+      letter-spacing: -0.03em;
+    }
+
+    .panel p {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .field label {
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      outline: none;
+      color: var(--text);
+      background: rgba(2, 6, 23, 0.74);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    .movie-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .movie-card {
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .movie-card-body {
+      padding: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .movie-title {
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+      font-size: 17px;
+    }
+
+    .movie-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .overview {
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.45;
+      min-height: 58px;
+    }
+
+    .generated-poster {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      min-height: 250px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at var(--x1, 20%) var(--y1, 20%), rgba(255, 255, 255, 0.32), transparent 0 16%, transparent 34%),
+        radial-gradient(circle at var(--x2, 80%) var(--y2, 70%), rgba(255, 255, 255, 0.2), transparent 0 12%, transparent 32%),
+        linear-gradient(135deg, var(--c1), var(--c2) 48%, var(--c3));
+      isolation: isolate;
+    }
+
+    .generated-poster::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background:
+        repeating-linear-gradient(
+          var(--angle, 35deg),
+          rgba(255, 255, 255, 0.12) 0,
+          rgba(255, 255, 255, 0.12) 2px,
+          transparent 2px,
+          transparent 15px
+        );
+      transform: rotate(var(--rotate, 0deg));
+      opacity: 0.45;
+      z-index: 0;
+    }
+
+    .generated-poster::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, transparent 10%, rgba(0, 0, 0, 0.18) 46%, rgba(0, 0, 0, 0.78) 100%),
+        radial-gradient(circle at center, transparent 36%, rgba(0, 0, 0, 0.4) 100%);
+      z-index: 1;
+    }
+
+    .poster-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.44;
+      z-index: 1;
+    }
+
+    .poster-content {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .poster-badge {
+      align-self: flex-start;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.86);
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 999px;
+      padding: 6px 9px;
+      backdrop-filter: blur(6px);
+    }
+
+    .poster-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .poster-genre {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .poster-title {
+      font-size: clamp(22px, 4.2vw, 32px);
+      line-height: 0.98;
+      letter-spacing: -0.08em;
+      font-weight: 900;
+      text-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+      word-break: keep-all;
+    }
+
+    .poster-sub {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 12px;
+    }
+
+    .tier-board {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tier-row {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(2, 6, 23, 0.46);
+      min-height: 150px;
+    }
+
+    .tier-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 900;
+      color: #020617;
+    }
+
+    .tier-S { background: #f87171; }
+    .tier-A { background: #fb923c; }
+    .tier-B { background: #facc15; }
+    .tier-C { background: #4ade80; }
+    .tier-D { background: #60a5fa; }
+    .tier-E { background: #a78bfa; }
+
+    .tier-items {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      align-content: start;
+    }
+
+    .tier-mini {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .tier-mini .generated-poster {
+      min-height: 210px;
+    }
+
+    .tier-mini-body {
+      padding: 10px;
+    }
+
+    .rating-line {
+      color: #fde68a;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .review {
+      margin-top: 7px;
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      font-size: 12px;
+      padding: 5px 7px;
+      border-radius: 999px;
+      color: #dbeafe;
+      background: rgba(59, 130, 246, 0.14);
+      border: 1px solid rgba(147, 197, 253, 0.18);
+    }
+
+    .empty {
+      color: var(--muted);
+      padding: 16px;
+      border: 1px dashed var(--line);
+      border-radius: 14px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .follow-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 14px;
+    }
+
+    .user-card
+ {
+      background: rgba(2, 6, 23, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .user-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .user-card p {
+      margin: 0 0 12px;
+      font-size: 13px;
+    }
+
+    .share-box {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .share-url {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      background: rgba(17, 24, 39, 0.96);
+      color: white;
+      border: 1px solid var(--line);
+      padding: 12px 15px;
+      border-radius: 999px;
+      display: none;
+      z-index: 50;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .login-box {
+        justify-content: flex-start;
+      }
+
+      .tier-row {
+        grid-template-columns: 58px 1fr;
+      }
+
+      .tier-label {
+        font-size: 26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <strong>Movie Tier List</strong>
+        <span>내가 본 영화를 별점으로 자동 티어 분류하기</span>
+      </div>
+
+      <div class="login-box">
+        <span id="loginStatus" class="hint">로그인이 필요합니다</span>
+        <button class="small-btn primary" onclick="login('Google')">Google 로그인</button>
+        <button class="small-btn primary" onclick="login('Kakao')">Kakao 로그인</button>
+        <button class="small-btn" onclick="logout()">로그아웃</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="notice">
+      <b>안내:</b> 이 페이지는 외부 서버, TMDB API, 이미지 파일을 사용하지 않습니다.
+      실제 영화 공식 포스터 대신, <b>영화 제목과 장르를 기반으로 CSS/SVG가 자동 생성한 스타일 포스터</b>를 표시합니다.
+      따라서 포스터는 공식 이미지가 아니라 데모용 대체 이미지입니다.
+    </div>
+
+    <nav class="tabs">
+      <button class="tab active" onclick="showTab('home', this)">내 티어리스트</button>
+      <button class="tab" onclick="showTab('movies', this)">영화 관리</button>
+      <button class="tab" onclick="showTab('follow', this)">팔로우</button>
+      <button class="tab" onclick="showTab('share', this)">공유</button>
+    </nav>
+
+    <section id="home" class="section active">
+      <div class="panel">
+        <h2>내 영화 티어리스트</h2>
+        <p>
+          별점은 5점 만점, 0.5점 단위로 선택할 수 있습니다.
+          티어는 정수 기준으로 자동 분류됩니다.
+          예: 4.5점 → A티어, 3.5점 → B티어
+        </p>
+        <div id="tierBoard" class="tier-board"></div>
+      </div>
+    </section>
+
+    <section id="movies" class="section">
+      <div class="grid">
+        <aside class="panel">
+          <h2 id="formTitle">영화 추가</h2>
+
+          <form id="movieForm">
+            <input type="hidden" id="editId" />
+
+            <div class="field">
+              <label for="title">영화 제목</label>
+              <input id="title" required placeholder="예: 인터스텔라" />
+            </div>
+
+            <div class="field">
+              <label for="genre">장르</label>
+              <select id="genre">
+                <option>SF</option>
+                <option>액션</option>
+                <option>로맨스</option>
+                <option>공포</option>
+                <option>드라마</option>
+                <option>코미디</option>
+                <option>판타지</option>
+                <option>스릴러</option>
+                <option>애니메이션</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="releaseDate">개봉일</label>
+              <input id="releaseDate" type="date" />
+            </div>
+
+            <div class="field">
+              <label for="rating">별점</label>
+              <select id="rating"></select>
+              <div class="hint">5점→S, 4점→A, 3점→B, 2점→C, 1점→D, 0점→E</div>
+            </div>
+
+            <div class="field">
+              <label for="overview">줄거리</label>
+              <textarea id="overview" placeholder="간단한 줄거리를 입력하세요."></textarea>
+            </div>
+
+            <div class="field">
+              <label for="review">한줄평</label>
+              <textarea id="review" placeholder="예: 다시 봐도 좋은 영화"></textarea>
+            </div>
+
+            <div class="field">
+              <label for="watched">감상 여부</label>
+              <select id="watched">
+                <option value="true">감상 완료</option>
+                <option value="false">볼 예정</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="visibility">공개 여부</label>
+              <select id="visibility">
+                <option value="public">공개</option>
+                <option value="private">비공개</option>
+              </select>
+            </div>
+
+            <button class="primary" type="submit" style="width:100%;">저장하기</button>
+            <button type="button" onclick="resetForm()" style="width:100%; margin-top:8px;">입력 초기화</button>
+          </form>
+        </aside>
+
+        <div class="panel">
+          <h2>등록한 영화</h2>
+          <p>
+            각 영화 카드는 실제 포스터가 아니라 자동 생성 스타일 포스터를 사용합니다.
+          </p>
+          <div id="movieList" class="movie-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="follow" class="section">
+      <div class="panel">
+        <h2>팔로우</h2>
+        <p>데모용 팔로우 화면입니다. 실제 서버 없이 브라우저 안에서만 동작합니다.</p>
+        <div id="followList" class="follow-list"></div>
+      </div>
+    </section>
+
+    <section id="share" class="section">
+      <div class="panel">
+        <h2>공유하기</h2>
+        <p>
+          내 티어리스트 공유 링크 예시입니다.
+          이 단일 HTML 버전에서는 실제 서버 공유가 아니라 화면용 데모 링크입니다.
+        </p>
+
+        <div class="share-box">
+          <input id="shareUrl" class="share-url" readonly />
+          <button class="primary" onclick="copyShareUrl()">복사</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "movie-tier-list-css-svg-demo";
+
+    let currentUser = localStorage.getItem("movieTierUser") || "";
+    let movies = loadMovies();
+
+    const fakeUsers = [
+      { name: "영화좋아하는사람", desc: "SF와 스릴러 영화를 주로 평가합니다.", following: false },
+      { name: "주말시네마", desc: "주말에 본 영화들을 티어로 정리합니다.", following: true },
+      { name: "애니리뷰어", desc: "애니메이션과 판타지 장르를 좋아합니다.", following: false }
+    ];
+
+    const genrePalettes = {
+      "SF": ["#020617", "#2563eb", "#7c3aed"],
+      "액션": ["#450a0a", "#dc2626", "#f97316"],
+      "로맨스": ["#831843", "#ec4899", "#fb7185"],
+      "공포": ["#030712", "#7f1d1d", "#111827"],
+      "드라마": ["#1e293b", "#64748b", "#0f172a"],
+      "코미디": ["#713f12", "#facc15", "#fb923c"],
+      "판타지": ["#14532d", "#22c55e", "#a855f7"],
+      "스릴러": ["#111827", "#334155", "#eab308"],
+      "애니메이션": ["#1d4ed8", "#38bdf8", "#f0abfc"]
+    };
+
+    function loadMovies() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch {
+          return [];
+        }
+      }
+
+      return [
+        {
+          id: makeId(),
+          title: "인터스텔라",
+          genre: "SF",
+          releaseDate: "2014-11-06",
+          rating: 5,
+          overview: "우주와 시간, 가족애를 중심으로 펼쳐지는 SF 영화.",
+          review: "웅장하고 여운이 오래 남는다.",
+          watched: true,
+          visibility: "public"
+        },
+        {
+          id: makeId(),
+          title: "기생충",
+          genre: "스릴러",
+          releaseDate: "2019-05-30",
+          rating: 4.5,
+          overview: "두 가족을 통해 계층 문제를 날카롭게 보여주는 영화.",
+          review: "장면마다 긴장감이 살아있다.",
+          watched: true,
+          visibility: "public"
+        },
+        {
+          id: makeId(),
+          title: "라라랜드",
+          genre: "로맨스",
+          releaseDate: "2016-12-07",
+          rating: 4,
+          overview: "꿈과 사랑 사이에서 고민하는 두 사람의 이야기.",
+          review: "음악과 색감이 정말 좋다.",
+          watched: true,
+          visibility: "private"
+        }
+      ];
+    }
+
+    function saveMovies() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
+    }
+
+    function makeId() {
+      return "movie-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function initRatingOptions() {
+      const rating = document.getElementById("rating");
+
+      for (let score = 5; score >= 0; score -= 0.5) {
+        const option = document.createElement("option");
+        option.value = score;
+        option.textContent = `${score.toFixed(1)}점`;
+        rating.appendChild(option);
+      }
+    }
+
+    function hashText(text) {
+      let hash = 0;
+      const source = String(text || "movie");
+
+      for (let i = 0; i < source.length; i++) {
+        hash = (hash * 31 + source.charCodeAt(i)) >>> 0;
+      }
+
+      return hash;
+    }
+
+    function posterVars(movie) {
+      const palette = genrePalettes[movie.genre] || genrePalettes["드라마"];
+      const h = hashText(movie.title + movie.genre);
+
+      return `
+        --c1:${palette[0]};
+        --c2:${palette[1]};
+        --c3:${palette[2]};
+        --x1:${15 + (h % 60)}%;
+        --y1:${10 + (h % 35)}%;
+        --x2:${35 + (h % 55)}%;
+        --y2:${45 + (h % 42)}%;
+        --angle:${25 + (h % 75)}deg;
+        --rotate:${h % 12}deg;
+      `;
+    }
+
+    function createPosterHTML(movie) {
+      const safeTitle = escapeHTML(movie.title);
+      const safeGenre = escapeHTML(movie.genre);
+      const year = movie.releaseDate ? movie.releaseDate.slice(0, 4) : "YEAR";
+
+      return `
+        <div class="generated-poster" style="${posterVars(movie)}" aria-label="${safeTitle} 자동 생성 포스터">
+          <svg class="poster-svg" viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true">
+            <circle cx="55" cy="80" r="34" fill="rgba(255,255,255,0.22)"></circle>
+            <circle cx="148" cy="132" r="58" fill="rgba(255,255,255,0.12)"></circle>
+            <path d="M0 245 C45 210 88 260 133 222 C165 195 182 216 200 198 L200 300 L0 300 Z"
+              fill="rgba(0,0,0,0.34)"></path>
+            <path d="M24 42 L176 258" stroke="rgba(255,255,255,0.2)" stroke-width="3"></path>
+            <path d="M176 42 L24 258" stroke="rgba(255,255,255,0.12)" stroke-width="2"></path>
+          </svg>
+
+          <div class="poster-content">
+            <div class="poster-badge">AUTO STYLE POSTER</div>
+
+            <div class="poster-bottom">
+              <div class="poster-genre">${safeGenre}</div>
+              <div class="poster-title">${safeTitle}</div>
+              <div class="poster-sub">${year} · Generated with CSS/SVG</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getTier(score) {
+      const value = Math.floor(Number(score));
+
+      if (value >= 5) return "S";
+      if (value === 4) return "A";
+      if (value === 3) return "B";
+      if (value === 2) return "C";
+      if (value === 1) return "D";
+      return "E";
+    }
+
+    function ratingStars(score) {
+      return "★".repeat(Math.floor(score)) + (score % 1 ? "½" : "");
+    }
+
+    function renderMovies() {
+      const movieList = document.getElementById("movieList");
+
+      if (!movies.length) {
+        movieList.innerHTML = `<div class="empty">아직 등록한 영화가 없습니다.<br>왼쪽에서 영화를 추가해 보세요.</div>`;
+        return;
+      }
+
+      movieList.innerHTML = movies.map(movie => `
+        <article class="movie-card">
+          ${createPosterHTML(movie)}
+
+          <div class="movie-card-body">
+            <div>
+              <div class="movie-title">${escapeHTML(movie.title)}</div>
+              <div class="movie-meta">
+                ${escapeHTML(movie.genre)}
+                ${movie.releaseDate ? " · " + escapeHTML(movie.releaseDate) : ""}
+                                · ${Number(movie.rating).toFixed(1)}점 · ${getTier(movie.rating)}티어
+              </div>
+            </div>
+
+            <div class="overview">
+              ${escapeHTML(movie.overview || "줄거리 정보가 없습니다.")}
+            </div>
+
+            <div class="tag-row">
+              <span class="tag">${movie.watched ? "감상 완료" : "볼 예정"}</span>
+              <span class="tag">${movie.visibility === "public" ? "공개" : "비공개"}</span>
+            </div>
+
+            <div class="review">
+              한줄평: ${escapeHTML(movie.review || "아직 한줄평이 없습니다.")}
+            </div>
+
+            <div style="display:flex; gap:8px; margin-top:auto;">
+              <button class="small-btn" onclick="editMovie('${movie.id}')">수정</button>
+              <button class="small-btn danger" onclick="deleteMovie('${movie.id}')">삭제</button>
+            </div>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderTierBoard() {
+      const tierBoard = document.getElementById("tierBoard");
+      const tiers = ["S", "A", "B", "C", "D", "E"];
+
+      tierBoard.innerHTML = tiers.map(tier => {
+        const tierMovies = movies.filter(movie => getTier(movie.rating) === tier);
+
+        return `
+          <div class="tier-row">
+            <div class="tier-label tier-${tier}">${tier}</div>
+
+            <div class="tier-items">
+              ${
+                tierMovies.length
+                  ? tierMovies.map(movie => `
+                    <div class="tier-mini">
+                      ${createPosterHTML(movie)}
+                      <div class="tier-mini-body">
+                        <div class="movie-title">${escapeHTML(movie.title)}</div>
+                        <div class="rating-line">
+                          ${ratingStars(Number(movie.rating))}
+                          ${Number(movie.rating).toFixed(1)}점
+                        </div>
+                        <div class="review">
+                          ${escapeHTML(movie.review || "한줄평 없음")}
+                        </div>
+                      </div>
+                    </div>
+                  `).join("")
+                  : `<div class="empty">${tier}티어 영화가 없습니다.</div>`
+              }
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderFollowList() {
+      const followList = document.getElementById("followList");
+
+      followList.innerHTML = fakeUsers.map((user, index) => `
+        <div class="user-card">
+          <strong>${escapeHTML(user.name)}</strong>
+          <p>${escapeHTML(user.desc)}</p>
+          <button class="small-btn ${user.following ? "" : "primary"}" onclick="toggleFollow(${index})">
+            ${user.following ? "팔로잉" : "팔로우"}
+          </button>
+        </div>
+      `).join("");
+    }
+
+    function toggleFollow(index) {
+      fakeUsers[index].following = !fakeUsers[index].following;
+      renderFollowList();
+      showToast(fakeUsers[index].following ? "팔로우했습니다." : "팔로우를 취소했습니다.");
+    }
+
+    function renderAll() {
+      renderMovies();
+      renderTierBoard();
+      renderFollowList();
+      updateLoginStatus();
+      setShareUrl();
+    }
+
+    function editMovie(id) {
+      const movie = movies.find(item => item.id === id);
+      if (!movie) return;
+
+      document.getElementById("formTitle").textContent = "영화 수정";
+      document.getElementById("editId").value = movie.id;
+      document.getElementById("title").value = movie.title;
+      document.getElementById("genre").value = movie.genre;
+      document.getElementById("releaseDate").value = movie.releaseDate || "";
+      document.getElementById("rating").value = movie.rating;
+      document.getElementById("overview").value = movie.overview || "";
+      document.getElementById("review").value = movie.review || "";
+      document.getElementById("watched").value = String(movie.watched);
+      document.getElementById("visibility").value = movie.visibility;
+
+      const movieTab = [...document.querySelectorAll(".tab")].find(btn => btn.textContent.includes("영화 관리"));
+      showTab("movies", movieTab);
+
+      showToast("수정할 영화 정보를 불러왔습니다.");
+    }
+
+    function deleteMovie(id) {
+      const target = movies.find(movie => movie.id === id);
+      if (!target) return;
+
+      const ok = confirm(`"${target.title}" 영화를 삭제할까요?`);
+      if (!ok) return;
+
+      movies = movies.filter(movie => movie.id !== id);
+      saveMovies();
+      renderAll();
+      showToast("영화를 삭제했습니다.");
+    }
+
+    function resetForm() {
+      document.getElementById("movieForm").reset();
+      document.getElementById("editId").value = "";
+      document.getElementById("formTitle").textContent = "영화 추가";
+      document.getElementById("rating").value = "5";
+    }
+
+    function showTab(sectionId, button) {
+      document.querySelectorAll(".section").forEach(section => {
+        section.classList.remove("active");
+      });
+
+      document.querySelectorAll(".tab").forEach(tab => {
+        tab.classList.remove("active");
+      });
+
+      document.getElementById(sectionId).classList.add("active");
+
+      if (button) {
+        button.classList.add("active");
+      }
+    }
+
+    function login(provider) {
+      currentUser = `${provider} 사용자`;
+      localStorage.setItem("movieTierUser", currentUser);
+      updateLoginStatus();
+      showToast(`${provider} 로그인되었습니다. 데모용 로그인입니다.`);
+    }
+
+    function logout() {
+      currentUser = "";
+      localStorage.removeItem("movieTierUser");
+      updateLoginStatus();
+      showToast("로그아웃되었습니다.");
+    }
+
+    function updateLoginStatus() {
+      const loginStatus = document.getElementById("loginStatus");
+
+      if (currentUser) {
+        loginStatus.textContent = `${currentUser} 로그인 중`;
+      } else {
+        loginStatus.textContent = "로그인이 필요합니다";
+      }
+    }
+
+    function setShareUrl() {
+      const shareUrl = document.getElementById("shareUrl");
+      const baseUrl = location.href.split("#")[0];
+      shareUrl.value = `${baseUrl}#my-tier-list`;
+    }
+
+    async function copyShareUrl() {
+      const shareUrl = document.getElementById("shareUrl");
+
+      try {
+        await navigator.clipboard.writeText(shareUrl.value);
+        showToast("공유 링크를 복사했습니다.");
+      } catch {
+        shareUrl.select();
+        document.execCommand("copy");
+        showToast("공유 링크를 복사했습니다.");
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
+
+    document.getElementById("movieForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const editId = document.getElementById("editId").value;
+
+      const movieData = {
+        id: editId || makeId(),
+        title: document.getElementById("title").value.trim(),
+        genre: document.getElementById("genre").value,
+        releaseDate: document.getElementById("releaseDate").value,
+        rating: Number(document.getElementById("rating").value),
+        overview: document.getElementById("overview").value.trim(),
+        review: document.getElementById("review").value.trim(),
+        watched: document.getElementById("watched").value === "true",
+        visibility: document.getElementById("visibility").value
+      };
+
+      if (!movieData.title) {
+        showToast("영화 제목을 입력해 주세요.");
+        return;
+      }
+
+      if (editId) {
+        movies = movies.map(movie => movie.id === editId ? movieData : movie);
+        showToast("영화 정보를 수정했습니다.");
+      } else {
+        movies.unshift(movieData);
+        showToast("영화를 추가했습니다.");
+      }
+
+      saveMovies();
+      resetForm();
+      renderAll();
+    });
+
+    initRatingOptions();
+    resetForm();
+    renderAll();
+  </script>
+</body>
+</html>

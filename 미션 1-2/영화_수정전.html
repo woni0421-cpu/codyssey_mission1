@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>영화 티어리스트</title>
+
+  <style>
+    :root {
+      --bg: #111827;
+      --panel: #1f2937;
+      --panel2: #273449;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --line: #374151;
+      --primary: #7c3aed;
+      --primary2: #a78bfa;
+      --danger: #ef4444;
+
+      --s: #f87171;
+      --a: #fb923c;
+      --b: #facc15;
+      --c: #4ade80;
+      --d: #60a5fa;
+      --e: #a78bfa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 58, 237, 0.35), transparent 30%),
+        radial-gradient(circle at top right, rgba(96, 165, 250, 0.2), transparent 30%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: var(--text);
+      background: var(--panel2);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: #334155;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #ec4899);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #6d28d9, #db2777);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.22);
+      color: #fecaca;
+    }
+
+    .btn-small {
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(17, 24, 39, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .logo-badge {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #ec4899);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .hero {
+      padding: 44px 0 24px;
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 20px;
+    }
+
+    .panel,
+    .hero-card {
+      background: linear-gradient(180deg, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.95));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+    }
+
+    .hero-card {
+      padding: 32px;
+    }
+
+    .hero h1 {
+      margin: 0 0 14px;
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 17px;
+    }
+
+    .highlight {
+      color: var(--primary2);
+    }
+
+    .login-box {
+      padding: 24px;
+    }
+
+    .login-box h2 {
+      margin: 0 0 8px;
+    }
+
+    .login-box p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .login-buttons {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .login-buttons button {
+      width: 100%;
+      border-radius: 14px;
+      text-align: left;
+    }
+
+    main {
+      padding-bottom: 60px;
+    }
+
+    .section {
+      margin-top: 28px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 25px;
+    }
+
+    .section-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .panel {
+      padding: 20px;
+    }
+
+    .notice {
+      padding: 14px 16px;
+      border-radius: 16px;
+      line-height: 1.6;
+      color: #ddd6fe;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px dashed #6366f1;
+    }
+
+    .input {
+      width: 100%;
+      padding: 12px 14px;
+      color: var(--text);
+      background: #0f172a;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: var(--primary2);
+      box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    label {
+      color: #d1d5db;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat {
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tier-board {
+      display: grid;
+      gap: 12px;
+    }
+
+    .tier-row {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      min-height: 116px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .tier-label {
+      display: grid;
+      place-items: center;
+      color: #111827;
+      font-size: 34px;
+      font-weight: 1000;
+    }
+
+    .tier-label.s { background: var(--s); }
+    .tier-label.a { background: var(--a); }
+    .tier-label.b { background: var(--b); }
+    .tier-label.c { background: var(--c); }
+    .tier-label.d { background: var(--d); }
+    .tier-label.e { background: var(--e); }
+
+    .tier-items {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      overflow-x: auto;
+      align-items: stretch;
+    }
+
+    .empty {
+      width: 100%;
+      min-height: 86px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .rated-card {
+      min-width: 195px;
+      max-width: 220px;
+      background: #111827;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .poster {
+      height: 132px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(135deg, #334155, #7c3aed);
+    }
+
+    .rated-body {
+      padding: 12px;
+    }
+
+    .rated-body h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .review {
+      margin: 8px 0;
+      color: #e5e7eb;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(124, 58, 237, 0.18);
+      color: #ddd6fe;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge.green {
+      background: rgba(34, 197, 94, 0.16);
+      color: #bbf7d0;
+    }
+
+    .badge.gray {
+      background: rgba(148, 163, 184, 0.14);
+      color: #cbd5e1;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .movie-card {
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .movie-info {
+      padding: 14px;
+    }
+
+    .movie-info h3 {
+      margin: 0 0 6px;
+    }
+
+    .movie-info p {
+      margin: 8px 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .check-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .feed-list,
+    .recommend-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .feed-item {
+      display: grid;
+      grid-template-columns: 76px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .mini-poster {
+      height: 84px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 8px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 900;
+      color: white;
+      background: linear-gradient(135deg, #334155, #7c3aed);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    footer {
+      padding: 30px 0 50px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .movie-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .tools {
+        grid-template-columns: 1fr;
+      }
+
+      .movie-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tier-row {
+        grid-template-columns: 64px 1fr;
+      }
+
+      .tier-label {
+        font-size: 28px;
+      }
+
+      .feed-item {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">
+        <div class="logo-badge">🎬</div>
+        <span>무비티어</span>
+      </div>
+
+      <div class="nav-actions">
+        <span id="userLabel" class="meta">로그인 전</span>
+        <button id="shareBtn" class="btn-small">공유</button>
+        <button id="resetBtn" class="btn-small btn-danger">초기화</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="hero">
+      <div class="hero-card">
+        <h1>
+          내가 본 영화를<br />
+          <span class="highlight">티어리스트</span>로 기록하세요
+        </h1>
+        <p>
+          0점부터 5점까지 0.5점 단위로 평가하고, 점수에 따라 S~E 티어가 자동 분류됩니다.
+          장르 기반 추천, 공개/비공개 선택, 팔로우와 공유 기능까지 포함한 브라우저 단독 실행용 예시입니다.
+        </p>
+      </div>
+
+      <div class="panel login-box">
+        <h2>소셜 로그인</h2>
+        <p>
+          실제 서버 없이 동작하는 데모입니다. 아래 버튼을 누르면 가상 로그인 상태가 됩니다.
+        </p>
+
+        <div class="login-buttons">
+          <button onclick="login('카카오 사용자')">💬 카카오로 시작하기</button>
+          <button onclick="login('구글 사용자')">🌐 구글로 시작하기</button>
+          <button onclick="login('네이버 사용자')">🟢 네이버로 시작하기</button>
+        </div>
+      </div>
+    </section>
+
+    <main>
+      <section class="section">
+        <div class="notice">
+          <strong>안내:</strong>
+          TMDB API는 실제 외부 서버와 API 키가 필요하므로, 이 파일은 외부 서버나 API 없이 샘플 영화 데이터와 브라우저 저장소(localStorage)만 사용합니다.
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>내 기록 요약</h2>
+            <p>평가한 영화 수, 평균 별점, 공개 기록을 확인할 수 있습니다.</p>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalCount">0</strong>
+            <span>평가한 영화</span>
+          </div>
+          <div class="stat">
+            <strong id="avgRating">0.0</strong>
+            <span>평균 별점</span>
+          </div>
+          <div class="stat">
+            <strong id="topTier">-</strong>
+            <span>가장 많은 티어</span>
+          </div>
+          <div class="stat">
+            <strong id="publicCount">0</strong>
+            <span>공개 기록</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>내 티어리스트</h2>
+            <p>별점에 따라 자동으로 S~E 티어가 분류됩니다.</p>
+          </div>
+        </div>
+
+        <div id="tierBoard" class="tier-board"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>영화 검색 및 평가</h2>
+            <p>샘플 영화 목록에서 영화를 찾고 별점과 한줄평을 저장하세요.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="tools">
+            <input
+              id="searchInput"
+              class="input"
+              type="text"
+              placeholder="영화 제목, 장르, 줄거리로 검색"
+            />
+
+            <select id="genreFilter" class="input">
+              <option value="전체">전체 장르</option>
+            </select>
+          </div>
+
+          <div id="movieGrid" class="movie-grid"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>장르 기반 추천</h2>
+            <p>내가 높게 평가한 장르와 비슷한 영화를 추천합니다.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div id="recommendList" class="recommend-list"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-title">
+          <div>
+            <h2>공개 피드</h2>
+            <p>공개로 저장한 내 영화 기록이 여기에 표시됩니다.</p>
+          </div>
+          <button class="btn-small" onclick="followDemo()">팔로우</button>
+        </div>
+
+        <div class="panel">
+          <div id="feedList" class="feed-list"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    무비티어 데모 · 단일 HTML 파일 · 외부 서버 없이 실행
+  </footer>
+
+  <script>
+    const movies = [
+      {
+        id: 1,
+        title: "인터스텔라",
+        year: "2014",
+        genres: ["SF", "드라마"],
+        overview: "인류의 미래를 위해 우주로 떠나는 탐사대의 이야기입니다."
+      },
+      {
+        id: 2,
+        title: "기생충",
+        year: "2019",
+        genres: ["드라마", "스릴러"],
+        overview: "두 가족의 만남을 통해 계층 문제를 날카롭게 보여주는 영화입니다."
+      },
+      {
+        id: 3,
+        title: "라라랜드",
+        year: "2016",
+        genres: ["로맨스", "뮤지컬"],
+        overview: "꿈과 사랑 사이에서 고민하는 두 예술가의 이야기입니다."
+      },
+      {
+        id: 4,
+        title: "어벤져스: 엔드게임",
+        year: "2019",
+        genres: ["액션", "히어로"],
+        overview: "위기에 빠진 세계를 구하기 위한 히어로들의 마지막 전투입니다."
+      },
+      {
+        id: 5,
+        title: "센과 치히로의 행방불명",
+        year: "2001",
+        genres: ["애니메이션", "판타지"],
+        overview: "신비한 세계에 들어간 소녀가 성장해 나가는 모험 이야기입니다."
+      },
+      {
+        id: 6,
+        title: "다크 나이트",
+        year: "2008",
+        genres: ["액션", "범죄"],
+        overview: "고담시를 지키려는 배트맨과 조커의 대립을 그린 영화입니다."
+      },
+      {
+        id: 7,
+        title: "너의 이름은",
+        year: "2016",
+        genres: ["애니메이션", "로맨스"],
+        overview: "서로의 몸이 바뀌는 두 청소년의 운명적인 만남을 다룹니다."
+      },
+      {
+        id: 8,
+        title: "인셉션",
+        year: "2010",
+        genres: ["SF", "액션"],
+        overview: "꿈속에 들어가 생각을 훔치거나 심는 특수한 작전을 다룹니다."
+      },
+      {
+        id: 9,
+        title: "부산행",
+        year: "2016",
+        genres: ["스릴러", "액션"],
+        overview: "좀비 사태 속에서 부산행 열차에 오른 사람들의 생존 이야기입니다."
+      }
+    ];
+
+    const tiers = ["S", "A", "B", "C", "D", "E"];
+    const tierClass = {
+      S: "s",
+      A: "a",
+      B: "b",
+      C: "c",
+      D: "d",
+      E: "e"
+    };
+
+    let currentUser = localStorage.getItem("movieTierUser") || "";
+    let ratings = JSON.parse(localStorage.getItem("movieTierRatings") || "[]");
+
+    const userLabel = document.getElementById("userLabel");
+    const totalCount = document.getElementById("totalCount");
+    const avgRating = document.getElementById("avgRating");
+    const topTier = document.getElementById("topTier");
+    const publicCount = document.getElementById("publicCount");
+    const tierBoard = document.getElementById("tierBoard");
+    const searchInput = document.getElementById("searchInput");
+    const genreFilter = document.getElementById("genreFilter");
+    const movieGrid = document.getElementById("movieGrid");
+    const recommendList = document.getElementById("recommendList");
+    const feedList = document.getElementById("feedList");
+    const shareBtn = document.getElementById("shareBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function escapeHTML(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getTier(score) {
+      const n = Number(score);
+
+      if (n >= 5) return "S";
+      if (n >= 4) return "A";
+      if (n >= 3) return "B";
+      if (n >= 2) return "C";
+      if (n >= 1) return "D";
+      return "E";
+    }
+
+    function getMovie(id) {
+      return movies.find(movie => movie.id === Number(id));
+    }
+
+    function saveRatings() {
+      localStorage.setItem("movieTierRatings", JSON.stringify(ratings));
+    }
+
+    function login(name) {
+      currentUser = name;
+      localStorage.setItem("movieTierUser", currentUser);
+      renderAll();
+      alert(name + "로 로그인되었습니다.");
+    }
+
+    function initGenreFilter() {
+      const genreSet = new Set();
+
+      movies.forEach(movie => {
+        movie.genres.forEach(genre => genreSet.add(genre));
+      });
+
+      [...genreSet].sort().forEach(genre => {
+        const option = document.createElement("option");
+        option.value = genre;
+        option.textContent = genre;
+        genreFilter.appendChild(option);
+      });
+    }
+
+    function makeRatingOptions(selectedValue = "3") {
+      let html = "";
+
+      for (let score = 0; score <= 5; score += 0.5) {
+        const value = score.toFixed(1);
+        const label = score % 1 === 0 ? String(score) : value;
+        const selected = Number(selectedValue) === Number(value) ? "selected" : "";
+
+        html += `<option value="${value}" ${selected}>${label}점</option>`;
+      }
+
+      return html;
+    }
+
+    function renderMovies() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      const selectedGenre = genreFilter.value;
+
+      const filtered = movies.filter(movie => {
+        const text = [
+          movie.title,
+          movie.year,
+          movie.overview,
+          movie.genres.join(" ")
+        ].join(" ").toLowerCase();
+
+        const matchKeyword = !keyword || text.includes(keyword);
+        const matchGenre =
+          selectedGenre === "전체" || movie.genres.includes(selectedGenre);
+
+        return matchKeyword && matchGenre;
+      });
+
+      if (filtered.length === 0) {
+        movieGrid.innerHTML = `<div class="empty">검색 결과가 없습니다.</div>`;
+        return;
+      }
+
+      movieGrid.innerHTML = filtered.map(movie => {
+        const saved = ratings.find(item => item.movieId === movie.id);
+
+        return `
+          <article class="movie-card">
+            <div class="poster">${escapeHTML(movie.title)}</div>
+
+            <div class="movie-info">
+              <h3>${escapeHTML(movie.title)}</h3>
+
+              <div class="meta">
+                ${escapeHTML(movie.year)} · ${escapeHTML(movie.genres.join(", "))}
+              </div>
+
+              <p>${escapeHTML(movie.overview)}</p>
+
+              <div class="form-grid">
+                <div class="field">
+                  <label>별점</label>
+                  <select id="score-${movie.id}" class="input">
+                    ${makeRatingOptions(saved ? saved.score : "3")}
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label>공개 여부</label>
+                  <select id="public-${movie.id}" class="input">
+                    <option value="true" ${saved?.isPublic ? "selected" : ""}>공개</option>
+                    <option value="false" ${saved && !saved.isPublic ? "selected" : ""}>비공개</option>
+                  </select>
+                </div>
+
+                <div class="field full">
+                  <label>한줄평</label>
+                  <textarea
+                    id="review-${movie.id}"
+                    class="input"
+                    placeholder="이 영화에 대한 짧은 감상을 적어보세요."
+                  >${saved ? escapeHTML(saved.review) : ""}</textarea>
+                </div>
+              </div>
+
+              <label class="check-line">
+                <input
+                  id="watched-${movie.id}"
+                  type="checkbox"
+                  ${saved?.watched ? "checked" : ""}
+                />
+                감상 완료
+              </label>
+
+              <div class="badge-row">
+                <button class="btn-primary btn-small" onclick="saveMovie(${movie.id})">
+                  저장하기
+                </button>
+
+                ${
+                  saved
+                    ? `<button class="btn-small btn-danger" onclick="deleteMovie(${movie.id})">삭제</button>`
+                    : ""
+                }
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function saveMovie(movieId) {
+      if (!currentUser) {
+        alert("먼저 소셜 로그인을 진행해주세요.");
+        return;
+      }
+
+      const movie = getMovie(movieId);
+      const score = Number(document.getElementById(`score-${movieId}`).value);
+      const review = document.getElementById(`review-${movieId}`).value.trim();
+      const watched = document.getElementById(`watched-${movieId}`).checked;
+      const isPublic = document.getElementById(`public-${movieId}`).value === "true";
+
+      const newItem = {
+        movieId,
+        score,
+        tier: getTier(score),
+        review,
+        watched,
+        isPublic,
+        createdAt: new Date().toISOString()
+      };
+
+      const index = ratings.findIndex(item => item.movieId === movieId);
+
+      if (index >= 0) {
+        ratings[index] = newItem;
+      } else {
+        ratings.push(newItem);
+      }
+
+      saveRatings();
+      renderAll();
+
+      alert(`"${movie.title}" 기록이 저장되었습니다.`);
+    }
+
+    function deleteMovie(movieId) {
+      const movie = getMovie(movieId);
+
+      if (!confirm(`"${movie.title}" 기록을 삭제할까요?`)) {
+        return;
+      }
+
+      ratings = ratings.filter(item => item.movieId !== movieId);
+      saveRatings();
+      renderAll();
+    }
+
+    function renderStats() {
+      totalCount.textContent = ratings.length;
+
+      if (ratings.length === 0) {
+        avgRating.textContent = "0.0";
+        topTier.textContent = "-";
+        publicCount.textContent = "0";
+        return;
+      }
+
+      const sum = ratings.reduce((acc, item) => acc + Number(item.score), 0);
+      avgRating.textContent = (sum / ratings.length).toFixed(1);
+
+      const tierCounts = {};
+      tiers.forEach(tier => tierCounts[tier] = 0);
+
+      ratings.forEach(item => {
+        tierCounts[item.tier]++;
+      });
+
+      const mostTier = tiers.reduce((best, tier) => {
+        return tierCounts[tier] > tierCounts[best] ? tier : best;
+      }, "S");
+
+      topTier.textContent = mostTier;
+      publicCount.textContent = ratings.filter(item => item.isPublic).length;
+    }
+
+    function renderTierBoard() {
+      tierBoard.innerHTML = tiers.map(tier => {
+        const items = ratings.filter(item => item.tier === tier);
+
+        return `
+          <div class="tier-row">
+            <div class="tier-label ${tierClass[tier]}">${tier}</div>
+
+            <div class="tier-items">
+              ${
+                items.length === 0
+                  ? `<div class="empty">${tier} 티어에 등록된 영화가 없습니다.</div>`
+                  : items.map(item => {
+                      const movie = getMovie(item.movieId);
+
+                      return `
+                        <article class="rated-card">
+                          <div class="poster">${escapeHTML(movie.title)}</div>
+
+                          <div class="rated-body">
+                            <h3>${escapeHTML(movie.title)}</h3>
+
+                            <div class="meta">
+                              ${escapeHTML(movie.year)} · ${escapeHTML(movie.genres.join(", "))}
+                            </div>
+
+                            <div class="review">
+                              ${item.review ? escapeHTML(item.review) : "한줄평이 없습니다."}
+                            </div>
+
+                            <div class="badge-row">
+                              <span class="badge">${item.score}점</span>
+                              <span class="badge green">${item.watched ? "감상 완료" : "감상 예정"}</span>
+                              <span class="badge gray">${item.isPublic ? "공개" : "비공개"}</span>
+                            </div>
+                          </div>
+                        </article>
+                      `;
+                    }).join("")
+              }
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderRecommendations() {
+      if (ratings.length === 0) {
+        recommendList.innerHTML = `
+          <div class="empty">
+            아직 평가한 영화가 없습니다. 영화를 평가하면 추천이 표시됩니다.
+          </div>
+        `;
+        return;
+      }
+
+      const genreScore = {};
+      const ratedMovieIds = new Set(ratings.map(item => item.movieId));
+
+      ratings.forEach(item => {
+        const movie = getMovie(item.movieId);
+        if (!movie) return;
+
+        movie.genres.forEach(genre => {
+          if (!genreScore[genre]) {
+            genreScore[genre] = 0;
+          }
+
+          genreScore[genre] += Number(item.score);
+        });
+      });
+
+      const recommended = movies
+        .filter(movie => !ratedMovieIds.has(movie.id))
+        .map(movie => {
+          const score = movie.genres.reduce((sum, genre) => {
+            return sum + (genreScore[genre] || 0);
+          }, 0);
+
+          return {
+            ...movie,
+            recommendScore: score
+          };
+        })
+        .filter(movie => movie.recommendScore > 0)
+        .sort((a, b) => b.recommendScore - a.recommendScore)
+        .slice(0, 3);
+
+      if (recommended.length === 0) {
+        recommendList.innerHTML = `
+          <div class="empty">
+            추천할 영화가 없습니다. 더 많은 영화를 평가해보세요.
+          </div>
+        `;
+        return;
+      }
+
+      recommendList.innerHTML = recommended.map(movie => {
+        return `
+          <div class="feed-item">
+            <div class="mini-poster">${escapeHTML(movie.title)}</div>
+
+            <div>
+              <h3>${escapeHTML(movie.title)}</h3>
+              <div class="meta">
+                ${escapeHTML(movie.year)} · ${escapeHTML(movie.genres.join(", "))}
+              </div>
+              <p class="review">${escapeHTML(movie.overview)}</p>
+              <div class="badge-row">
+                <span class="badge">장르 기반 추천</span>
+              </div>
+            </div>
+
+            <button class="btn-small" onclick="scrollToMovie(${movie.id})">
+              평가하기
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderFeed() {
+      const publicItems = ratings
+        .filter(item => item.isPublic)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      if (publicItems.length === 0) {
+        feedList.innerHTML = `
+          <div class="empty">
+            아직 공개된 기록이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      feedList.innerHTML = publicItems.map(item => {
+        const movie = getMovie(item.movieId);
+
+        return `
+          <div class="feed-item">
+            <div class="mini-poster">${escapeHTML(movie.title)}</div>
+
+            <div>
+              <h3>${escapeHTML(movie.title)}</h3>
+
+              <div class="meta">
+                ${escapeHTML(movie.year)} · ${escapeHTML(movie.genres.join(", "))}
+              </div>
+
+              <p class="review">
+                ${item.review ? escapeHTML(item.review) : "한줄평이 없습니다."}
+              </p>
+
+              <div class="badge-row">
+                <span class="badge">${item.score}점</span>
+                <span class="badge">${item.tier} 티어</span>
+                <span class="badge green">${item.watched ? "감상 완료" : "감상 예정"}</span>
+              </div>
+            </div>
+
+            <button class="btn-small" onclick="likeDemo()">
+              좋아요
+            </button>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function scrollToMovie(movieId) {
+      const searchSection = document.querySelector("#movieGrid");
+      const movie = getMovie(movieId);
+
+      if (movie) {
+        searchInput.value = movie.title;
+        genreFilter.value = "전체";
+        renderMovies();
+      }
+
+      searchSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+
+    function followDemo() {
+      if (!currentUser) {
+        alert("먼저 로그인해주세요.");
+        return;
+      }
+
+      alert("팔로우 기능은 데모로 처리되었습니다.");
+    }
+
+    function likeDemo() {
+      if (!currentUser) {
+        alert("먼저 로그인해주세요.");
+        return;
+      }
+
+      alert("좋아요가 반영되었습니다. 데모 기능입니다.");
+    }
+
+    function shareTierList() {
+      const text = currentUser
+        ? `${currentUser}님의 영화 티어리스트를 공유합니다.`
+        : "나의 영화 티어리스트를 공유합니다.";
+
+      const shareText = `${text}\n${location.href}`;
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareText)
+          .then(() => {
+            alert("공유 문구가 클립보드에 복사되었습니다.");
+          })
+          .catch(() => {
+            alert(shareText);
+          });
+      } else {
+        alert(shareText);
+      }
+    }
+
+    function resetData() {
+      const ok = confirm("모든 기록과 로그인 정보를 초기화할까요?");
+
+      if (!ok) {
+        return;
+      }
+
+      ratings = [];
+      currentUser = "";
+
+      localStorage.removeItem("movieTierRatings");
+      localStorage.removeItem("movieTierUser");
+
+      renderAll();
+      alert("초기화되었습니다.");
+    }
+
+    function renderAll() {
+      userLabel.textContent = currentUser
+        ? `${currentUser} 로그인 중`
+        : "로그인 전";
+
+      renderStats();
+      renderTierBoard();
+      renderMovies();
+      renderRecommendations();
+      renderFeed();
+    }
+
+    searchInput.addEventListener("input", renderMovies);
+    genreFilter.addEventListener("change", renderMovies);
+    shareBtn.addEventListener("click", shareTierList);
+    resetBtn.addEventListener("click", resetData);
+
+    initGenreFilter();
+    renderAll();
+  </script>
+</body>
+</html>
